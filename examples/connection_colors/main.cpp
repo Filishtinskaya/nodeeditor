@@ -22,7 +22,7 @@ registerDataModels()
 
   /*
      We could have more models registered.
-     All of them become items in the context meny of the scene.
+     All of them become items in the context menu of the scene.
 
      ret->registerModel<AnotherDataModel>();
      ret->registerModel<OneMoreDataModel>();
