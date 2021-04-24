@@ -1,23 +1,31 @@
 #include "ModelFromSchema.hpp"
+#include "NodeForm.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QFile>
+#include <QLayout>
+#include <QLabel>
 
-const QString SCHEMA_PATH = "gameEventScheme.json";
+#include <iostream>
 
+const QString SCHEMA_PATH = "/home/tetiana/Documents/NodeEditor/gameEventScheme.json";
 
-QJsonObject fetchJson() {
+QJsonObject fetchJson()
+{
     QFile file(SCHEMA_PATH);
-    //@todo exception handling
-    file.open(QIODevice::ReadOnly);
+    if (!file.open(QIODevice::ReadOnly)) {
+        throw std::runtime_error("schema file not found");
+    }
     QByteArray wholeFile = file.readAll();
 
     return QJsonDocument::fromJson(wholeFile).object();
 }
 
 ModelFromSchema::ModelFromSchema()
-    : schema(fetchJson())
+    : widget(new NodeForm()),
+      schema(fetchJson())
 {
+
 }
 

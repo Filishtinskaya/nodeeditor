@@ -12,13 +12,10 @@
 template<typename VectorType>
 void fillVectorFromJson(std::vector<VectorType>& v, const QJsonObject& obj, QStringView arrayName)
 {
-    for (QJsonValueRef parameter : obj[arrayName].toArray())
-    {
-        QJsonObject obj = parameter.toObject();
+    auto arr = obj[arrayName].toArray();
+    for (QJsonValueRef parameter : arr)
         v.emplace_back(parameter.toObject());
-    }
 }
-
 
 enum class ParameterType {
     String, Bool, Int, Enum, Image, Array
@@ -46,7 +43,8 @@ struct EnumParameter : public SchemaParameter
 };
 
 // C++ representation of the schema structure
-struct Schema {
+struct Schema
+{
     Schema(const QJsonObject& json);
 
     QString name, nodeArrayName;

@@ -2,6 +2,7 @@
 #define MODELFROMSCHEMA_H
 
 #include <QObject>
+#include <QFrame>
 
 #include <nodes/NodeDataModel>
 #include "Schema.hpp"
@@ -18,7 +19,9 @@ class ModelFromSchema : public NodeDataModel
     Q_OBJECT
 public:
     ModelFromSchema();
-    virtual ~ModelFromSchema() {}
+    virtual ~ModelFromSchema() {
+        delete widget;
+    }
     QString caption() const override
     {return QString("My Data Model");}
 
@@ -51,8 +54,9 @@ public:
         //
       }
 
-      QWidget* embeddedWidget() override { return nullptr; }
+      QWidget* embeddedWidget() override { return widget; }
 private:
+    QWidget* widget;
     Schema schema;
 };
 
