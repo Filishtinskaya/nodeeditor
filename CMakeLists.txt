@@ -39,7 +39,7 @@ endif()
 add_subdirectory(external)
 
 # Find the QtWidgets library
-find_package(Qt6 6.0.2 COMPONENTS
+find_package(Qt6 COMPONENTS
              Core
              Widgets
              Gui
