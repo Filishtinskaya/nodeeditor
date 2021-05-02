@@ -15,7 +15,7 @@ Schema::Schema(const QJsonObject& json)
       nodeArrayName(json["NodeArrayName"].toString())
 {
     fillVectorFromJson(parameters, json, QString("Parameters"));
-    fillVectorFromJson<Schema>(nodeArray, json, nodeArrayName);
+    fillVectorFromJson<Schema>(nodeArray, json, QString("NodeSchemes"));
 }
 
 SchemaParameter::SchemaParameter(const QJsonObject &obj)

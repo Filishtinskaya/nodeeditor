@@ -59,14 +59,14 @@ QWidget* NodeForm::makeEditingWidget(const SchemaParameter& param)
     }
 }
 
-NodeForm::NodeForm(Schema& schema) :
+NodeForm::NodeForm(Schema& aSchema) :
     QWidget(),
     ui(new Ui::NodeForm)
 {
     ui->setupUi(this);
 
-    ui->boxNodeArray->setTitle(schema.nodeArrayName);
-    for (auto& param : schema.parameters) {
+    ui->boxNodeArray->setTitle(aSchema.nodeArrayName);
+    for (auto& param : aSchema.parameters) {
 //        paramsEdWidgets.emplace_back(edWidget);
         ui->formLayout->addRow(param.name,
                                  makeEditingWidget(param));

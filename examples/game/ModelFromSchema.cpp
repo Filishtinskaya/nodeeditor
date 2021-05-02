@@ -36,7 +36,7 @@ void JsonSchemaParser::fetchModels()
 
 void JsonSchemaParser::registerModelFromSchema(std::shared_ptr<Schema> aSchema)
 {
-    DataModelRegistry::RegistryItemCreator creator = [&](){
+    DataModelRegistry::RegistryItemCreator creator = [=](){
         return std::make_unique<ModelFromSchema>(aSchema);
     };
 

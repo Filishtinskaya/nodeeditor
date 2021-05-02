@@ -37,6 +37,8 @@ public:
     QString caption() const override
     {return schema->name;}
 
+    bool captionVisible() const final {return true;} ;
+
     QString name() const override
      {return schema->name;}
 

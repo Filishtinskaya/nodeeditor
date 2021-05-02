@@ -15,7 +15,7 @@ class NodeForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit NodeForm(Schema& schema);
+    explicit NodeForm(Schema& aSchema);
     ~NodeForm();
 
 private:
