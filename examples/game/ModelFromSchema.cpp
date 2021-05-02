@@ -22,10 +22,42 @@ QJsonObject fetchJson()
     return QJsonDocument::fromJson(wholeFile).object();
 }
 
-ModelFromSchema::ModelFromSchema()
-    : widget(new NodeForm()),
-      schema(fetchJson())
-{
 
+JsonSchemaParser::JsonSchemaParser(DataModelRegistry& aReg)
+    : dmRegistry(aReg)
+{}
+
+void JsonSchemaParser::fetchModels()
+{
+    auto rootSchema = std::make_shared<Schema>(fetchJson());
+
+    registerModelFromSchema(rootSchema);
 }
+
+void JsonSchemaParser::registerModelFromSchema(std::shared_ptr<Schema> aSchema)
+{
+    DataModelRegistry::RegistryItemCreator creator = [&](){
+        return std::make_unique<ModelFromSchema>(aSchema);
+    };
+
+    dmRegistry.registerModel<ModelFromSchema>(creator);
+
+    for (auto& childSchema : aSchema->nodeArray) {
+        auto schemaPtr = std::make_shared<Schema>(childSchema);
+        registerModelFromSchema(schemaPtr);
+    }
+}
+
+
+ModelFromSchema::ModelFromSchema(std::shared_ptr<Schema> aSchema)
+    : schema(aSchema),
+      widget(new NodeForm(*schema))
+{
+}
+
+ModelFromSchema::~ModelFromSchema() {
+    delete widget;
+}
+
+QWidget *ModelFromSchema::embeddedWidget() { return widget; }
 

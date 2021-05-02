@@ -24,9 +24,9 @@ enum class ParameterType {
 struct SchemaParameter
 {
     static const std::map<QString, ParameterType> typeStrings;
-    QString name;
-    ParameterType type;
-    QString defaultValue; //std::variant???
+    const QString name;
+    const ParameterType type;
+    const QString defaultValue; //std::variant???
 
     SchemaParameter(const QJsonObject& obj);
 };
@@ -47,9 +47,9 @@ struct Schema
 {
     Schema(const QJsonObject& json);
 
-    QString name, nodeArrayName;
+    const QString name, nodeArrayName;
     std::vector<SchemaParameter> parameters;
-    std::vector<Schema> nodeSchemes;
+    std::vector<Schema> nodeArray;
 };
 
 #endif // SCHEMA_H

@@ -1,21 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>NodeForm</class>
- <widget name="NodeForm" class="QWidget">
+ <widget class="QWidget" name="NodeForm">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>412</width>
+    <height>367</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="boxParameters">
+     <property name="title">
+      <string>Parameters</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="boxNodeArray">
+     <property name="title">
+      <string>GroupBox</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2"/>
+    </widget>
+   </item>
+  </layout>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>
