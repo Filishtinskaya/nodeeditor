@@ -43,8 +43,7 @@ void JsonSchemaParser::registerModelFromSchema(std::shared_ptr<Schema> aSchema)
     dmRegistry.registerModel<ModelFromSchema>(creator);
 
     for (auto& childSchema : aSchema->nodeArray) {
-        auto schemaPtr = std::make_shared<Schema>(childSchema);
-        registerModelFromSchema(schemaPtr);
+        registerModelFromSchema(childSchema);
     }
 }
 

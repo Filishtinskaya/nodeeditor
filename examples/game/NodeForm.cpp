@@ -40,7 +40,11 @@ QWidget* NodeForm::makeEditingWidget(const SchemaParameter& param)
     }
     case ParameterType::Enum: {
         auto comboBox = new QComboBox(this);
-
+        auto enumParam = dynamic_cast<const EnumParameter*>(&param);
+        for (auto& value : enumParam->values) {
+            comboBox->addItem(value);
+        }
+        comboBox->setCurrentText(enumParam->defaultValue);
         return comboBox;
     }
 
@@ -68,8 +72,8 @@ NodeForm::NodeForm(Schema& aSchema) :
     ui->boxNodeArray->setTitle(aSchema.nodeArrayName);
     for (auto& param : aSchema.parameters) {
 //        paramsEdWidgets.emplace_back(edWidget);
-        ui->formLayout->addRow(param.name,
-                                 makeEditingWidget(param));
+        ui->formLayout->addRow(param->name,
+                                 makeEditingWidget(*param));
     }
 }
 
