@@ -24,27 +24,30 @@ enum class ParameterType {
     String, Bool, Int, Enum, Image, Array
 };
 
-struct SchemaParameter
+struct NodeParameter : public QObject
 {
     const QString name;
     const ParameterType type;
     const QString defaultValue; //std::variant???
 
     static ParameterType getType(const QJsonObject& obj);
-    SchemaParameter(const QJsonObject& obj);
+    NodeParameter(const QJsonObject& obj);
 
-    virtual ~SchemaParameter() = default;
+    virtual ~NodeParameter() = default;
 
-    using Ptr = std::shared_ptr<SchemaParameter>;
+    using Ptr = std::shared_ptr<NodeParameter>;
+
+    //relates to concrete instance
+    QString value;
 };
 
-struct ArrayParameter : public SchemaParameter
+struct ArrayParameter : public NodeParameter
 {
     ArrayParameter(const QJsonObject& obj);
-    std::vector<SchemaParameter::Ptr> properties;
+    std::vector<NodeParameter::Ptr> properties;
 };
 
-struct EnumParameter : public SchemaParameter
+struct EnumParameter : public NodeParameter
 {
     EnumParameter(const QJsonObject& obj);
     std::vector<QString> values;
@@ -58,7 +61,7 @@ struct Schema
     using Ptr = std::shared_ptr<Schema>;
 
     const QString name, nodeArrayName;
-    std::vector<SchemaParameter::Ptr> parameters;
+    std::vector<NodeParameter::Ptr> parameters;
     std::vector<Schema::Ptr> nodeArray;
 };
 

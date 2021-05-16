@@ -8,14 +8,15 @@ Schema::Schema(const QJsonObject& json)
     fillVectorFromJson(nodeArray, json, QString("NodeSchemes"));
 }
 
-SchemaParameter::SchemaParameter(const QJsonObject &obj)
+NodeParameter::NodeParameter(const QJsonObject &obj)
     : name(obj["Name"].toString()),
       type(getType(obj)),
-      defaultValue(obj["Default"].toString())
+      defaultValue(obj["Default"].toString()),
+      value(defaultValue)
 {
 }
 
-ParameterType SchemaParameter::getType(const QJsonObject &obj)
+ParameterType NodeParameter::getType(const QJsonObject &obj)
 {
     static const std::map<QString, ParameterType> typeStrings = {
         {"String", ParameterType::String},
@@ -29,13 +30,13 @@ ParameterType SchemaParameter::getType(const QJsonObject &obj)
 }
 
 EnumParameter::EnumParameter(const QJsonObject &obj)
-    : SchemaParameter(obj)
+    : NodeParameter(obj)
 {
     fillVectorFromJson(values, obj, QString("EnumValues"));
 }
 
 ArrayParameter::ArrayParameter(const QJsonObject &obj)
-    : SchemaParameter(obj)
+    : NodeParameter(obj)
 {
 
 }
@@ -47,15 +48,15 @@ Schema::Ptr fromJsonValueRef<Schema::Ptr>(const QJsonValueRef ref) {
 }
 
 template<>
-SchemaParameter::Ptr fromJsonValueRef<SchemaParameter::Ptr>(const QJsonValueRef ref) {
+NodeParameter::Ptr fromJsonValueRef<NodeParameter::Ptr>(const QJsonValueRef ref) {
     auto obj = ref.toObject();
-    switch(SchemaParameter::getType(obj)) {
+    switch(NodeParameter::getType(obj)) {
     case ParameterType::Enum:
         return std::make_shared<EnumParameter>(obj);
     case ParameterType::Array:
         return std::make_shared<ArrayParameter>(obj);
     default:
-        return std::make_shared<SchemaParameter>(obj);
+        return std::make_shared<NodeParameter>(obj);
     }
 }
 

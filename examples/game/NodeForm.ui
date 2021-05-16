@@ -25,7 +25,7 @@
    <item>
     <widget class="QGroupBox" name="boxNodeArray">
      <property name="title">
-      <string>GroupBox</string>
+      <string>NodeArrayName</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2"/>
     </widget>
