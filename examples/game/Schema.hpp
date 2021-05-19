@@ -24,34 +24,20 @@ enum class ParameterType {
     String, Bool, Int, Enum, Image, Array
 };
 
-struct NodeParameter : public QObject
+struct SchemaParameter
 {
     const QString name;
     const ParameterType type;
     const QString defaultValue; //std::variant???
 
     static ParameterType getType(const QJsonObject& obj);
-    NodeParameter(const QJsonObject& obj);
+    SchemaParameter(const QJsonObject& obj);
 
-    virtual ~NodeParameter() = default;
+    virtual ~SchemaParameter() = default;
 
-    using Ptr = std::shared_ptr<NodeParameter>;
-
-    //relates to concrete instance
-    QString value;
+    using Ptr = std::shared_ptr<SchemaParameter>;
 };
 
-struct ArrayParameter : public NodeParameter
-{
-    ArrayParameter(const QJsonObject& obj);
-    std::vector<NodeParameter::Ptr> properties;
-};
-
-struct EnumParameter : public NodeParameter
-{
-    EnumParameter(const QJsonObject& obj);
-    std::vector<QString> values;
-};
 
 // C++ representation of the schema structure
 struct Schema
@@ -61,9 +47,72 @@ struct Schema
     using Ptr = std::shared_ptr<Schema>;
 
     const QString name, nodeArrayName;
-    std::vector<NodeParameter::Ptr> parameters;
+    std::vector<SchemaParameter::Ptr> parameters;
     std::vector<Schema::Ptr> nodeArray;
 };
+
+struct ArrayParameter : public SchemaParameter
+{
+    ArrayParameter(const QJsonObject& obj);
+    std::vector<SchemaParameter::Ptr> properties;
+};
+
+struct EnumParameter : public SchemaParameter
+{
+    EnumParameter(const QJsonObject& obj);
+    std::vector<QString> values;
+};
+
+///////for concrete nodes///////////////////
+
+struct ParameterValue
+{
+    QString value;
+    const QString& name;
+    ParameterValue(const QString& aName)
+        : name(aName) {}
+    virtual void addToJsonObject(QJsonObject& obj) const {
+        obj[name] = value;
+    }
+    virtual ~ParameterValue() = default;
+};
+
+struct ArrayParameterValue : public ParameterValue
+{
+    struct Item {
+        std::vector<ParameterValue> paramValues;
+        void addToJsonArray(QJsonArray& arr) const {
+            QJsonObject obj;
+            for (auto& param : paramValues) {
+                obj[param.name] = param.value;
+            }
+            arr.push_back(obj);
+        };
+    };
+    void addToJsonObject(QJsonObject& obj) const override {
+        QJsonArray jsonArray;
+        for (auto& item : arr) {
+            item.addToJsonArray(jsonArray);
+        }
+        obj[name] = jsonArray;
+    }
+    std::vector<Item> arr;
+};
+
+struct NodeData
+{
+    NodeData(Schema::Ptr aSchema)
+        : schema(aSchema) {
+        parameterValues.reserve(aSchema->parameters.size());
+        for (size_t i = 0; i < schema->parameters.size(); i++) {
+            parameterValues.emplace_back(schema->parameters[i]->name);
+        }
+    }
+    QJsonObject toJsonObject() const;
+    Schema::Ptr schema;
+    std::vector<ParameterValue> parameterValues;
+};
+
 
 
 #endif // SCHEMA_H

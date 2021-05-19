@@ -15,16 +15,18 @@ class NodeForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit NodeForm(Schema& aSchema);
+    explicit NodeForm(NodeData& aData);
     ~NodeForm();
 
 private:
-    QWidget* makeEditingWidget(NodeParameter& param);
+    QWidget* makeEditingWidget(const SchemaParameter& param, ParameterValue* val);
 
     QLineEdit* edName,
                edNodeArrayName;
 
     Ui::NodeForm *ui;
+
+    NodeData& data;
 
 //    std::vector<QWidget*> paramsEdWidgets;
 };

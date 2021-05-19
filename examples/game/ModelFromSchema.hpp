@@ -10,7 +10,6 @@
 
 using QtNodes::PortType;
 using QtNodes::PortIndex;
-using QtNodes::NodeData;
 using QtNodes::NodeDataType;
 using QtNodes::NodeDataModel;
 using QtNodes::DataModelRegistry;
@@ -24,31 +23,28 @@ public:
     JsonSchemaParser(DataModelRegistry& aReg);
     void fetchModels();
 private:
-    void registerModelFromSchema(std::shared_ptr<Schema> aSchema);
+    void registerModelFromSchema(Schema::Ptr aSchema);
     DataModelRegistry& dmRegistry;
+    Schema::Ptr rootSchema;
 };
 
 class ModelFromSchema : public NodeDataModel
 {
     Q_OBJECT
 public:
-    ModelFromSchema(std::shared_ptr<Schema> aSchema);
+    ModelFromSchema(Schema::Ptr aSchema);
     virtual ~ModelFromSchema();
     QString caption() const override
-    {return schema->name;}
+    {return data.schema->name;}
 
     bool captionVisible() const final {return true;} ;
 
     QString name() const override
-     {return schema->name;}
+     {return data.schema->name;}
 
      QJsonObject save() const override
       {
-        QJsonObject modelJson;
-
-        modelJson["name"] = name();
-
-        return modelJson;
+        return data.toJsonObject();
       }
      unsigned int nPorts(PortType) const override
       {
@@ -58,19 +54,19 @@ public:
      NodeDataType dataType(PortType, PortIndex) const override
      {return {};}
 
-     std::shared_ptr<NodeData>outData(PortIndex) override
+     std::shared_ptr<QtNodes::NodeData>outData(PortIndex) override
       {
          return /*std::make_shared<NodeData>()*/{};
       }
 
-      void setInData(std::shared_ptr<NodeData>, int) override
+      void setInData(std::shared_ptr<QtNodes::NodeData>, int) override
       {
         //
       }
 
       QWidget* embeddedWidget() override;
 private:
-    std::shared_ptr<Schema> schema;
+    NodeData data;
     NodeForm* widget;
 };
 

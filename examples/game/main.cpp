@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     QWidget mainWidget;
 
     auto menuBar    = new QMenuBar();
-    auto saveAction = menuBar->addAction("Save..");
-    auto loadAction = menuBar->addAction("Load..");
+    auto saveAction = menuBar->addAction("Save");
+    auto loadAction = menuBar->addAction("Load");
 
     QVBoxLayout *l = new QVBoxLayout(&mainWidget);
 
@@ -49,6 +49,5 @@ int main(int argc, char *argv[])
     mainWidget.resize(800, 600);
     mainWidget.showNormal();
 
-
-  return app.exec();
+    return app.exec();
 }

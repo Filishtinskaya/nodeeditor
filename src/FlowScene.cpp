@@ -40,9 +40,10 @@ using QtNodes::TypeConverter;
 
 FlowScene::
 FlowScene(std::shared_ptr<DataModelRegistry> registry,
-          QObject * parent)
-  : QGraphicsScene(parent)
-  , _registry(std::move(registry))
+          QWidget * parent)
+  : QGraphicsScene(parent),
+    _registry(std::move(registry)),
+    mainWidget(*parent)
 {
   setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -53,7 +54,7 @@ FlowScene(std::shared_ptr<DataModelRegistry> registry,
 }
 
 FlowScene::
-FlowScene(QObject * parent)
+FlowScene(QWidget * parent)
   : FlowScene(std::make_shared<DataModelRegistry>(),
               parent)
 {}
@@ -477,21 +478,24 @@ void
 FlowScene::
 save() const
 {
-  QString fileName =
-    QFileDialog::getSaveFileName(nullptr,
+  if (currFileName.isEmpty()) {
+      currFileName = QFileDialog::getSaveFileName(nullptr,
                                  tr("Open Flow Scene"),
                                  QDir::homePath(),
-                                 tr("Flow Scene Files (*.flow)"));
+                                 tr("Flow Scene Files (*.json)"));
+  }
 
-  if (!fileName.isEmpty())
+
+  if (!currFileName.isEmpty())
   {
-    if (!fileName.endsWith("flow", Qt::CaseInsensitive))
-      fileName += ".flow";
+    if (!currFileName.endsWith("json", Qt::CaseInsensitive))
+      currFileName += ".json";
 
-    QFile file(fileName);
+    QFile file(currFileName);
     if (file.open(QIODevice::WriteOnly))
     {
       file.write(saveToMemory());
+      mainWidget.setWindowFilePath(currFileName);
     }
   }
 }
@@ -514,6 +518,9 @@ load()
 
   if (!file.open(QIODevice::ReadOnly))
     return;
+
+  currFileName = fileName;
+  mainWidget.setWindowFilePath(currFileName);
 
   clearScene();
 

@@ -29,12 +29,12 @@ JsonSchemaParser::JsonSchemaParser(DataModelRegistry& aReg)
 
 void JsonSchemaParser::fetchModels()
 {
-    auto rootSchema = std::make_shared<Schema>(fetchJson());
+    rootSchema = std::make_shared<Schema>(fetchJson());
 
     registerModelFromSchema(rootSchema);
 }
 
-void JsonSchemaParser::registerModelFromSchema(std::shared_ptr<Schema> aSchema)
+void JsonSchemaParser::registerModelFromSchema(Schema::Ptr aSchema)
 {
     DataModelRegistry::RegistryItemCreator creator = [=](){
         return std::make_unique<ModelFromSchema>(aSchema);
@@ -48,9 +48,9 @@ void JsonSchemaParser::registerModelFromSchema(std::shared_ptr<Schema> aSchema)
 }
 
 
-ModelFromSchema::ModelFromSchema(std::shared_ptr<Schema> aSchema)
-    : schema(aSchema),
-      widget(new NodeForm(*schema))
+ModelFromSchema::ModelFromSchema(Schema::Ptr aSchema)
+    : data(aSchema),
+      widget(new NodeForm(data))
 {
 }
 

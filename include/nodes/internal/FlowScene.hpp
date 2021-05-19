@@ -32,9 +32,9 @@ class NODE_EDITOR_PUBLIC FlowScene
 public:
 
   FlowScene(std::shared_ptr<DataModelRegistry> registry,
-            QObject * parent = Q_NULLPTR);
+            QWidget * parent = Q_NULLPTR);
 
-  FlowScene(QObject * parent = Q_NULLPTR);
+  FlowScene(QWidget * parent = Q_NULLPTR);
 
   ~FlowScene();
 
@@ -147,6 +147,8 @@ private:
 
   std::unordered_map<QUuid, SharedConnection> _connections;
   std::unordered_map<QUuid, UniqueNode>       _nodes;
+  mutable QString currFileName;
+  QWidget& mainWidget;
 
 private Q_SLOTS:
 
