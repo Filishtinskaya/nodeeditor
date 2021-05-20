@@ -28,8 +28,9 @@ int main(int argc, char *argv[])
     QWidget mainWidget;
 
     auto menuBar    = new QMenuBar();
-    auto saveAction = menuBar->addAction("Save");
-    auto loadAction = menuBar->addAction("Load");
+    auto saveAction = menuBar->addAction("Save scene");
+//    auto saveJsonAction = menuBar->addAction("Save JSON");
+    auto loadAction = menuBar->addAction("Load scene");
 
     QVBoxLayout *l = new QVBoxLayout(&mainWidget);
 

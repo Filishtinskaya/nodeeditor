@@ -19,7 +19,7 @@ public:
     ~NodeForm();
 
 private:
-    QWidget* makeEditingWidget(const SchemaParameter& param, ParameterValue* val);
+    QWidget* makeEditingWidget(NodeParameter* val);
 
     QLineEdit* edName,
                edNodeArrayName;

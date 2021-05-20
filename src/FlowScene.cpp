@@ -509,7 +509,7 @@ load()
     QFileDialog::getOpenFileName(nullptr,
                                  tr("Open Flow Scene"),
                                  QDir::homePath(),
-                                 tr("Flow Scene Files (*.flow)"));
+                                 tr("Flow Scene Files (*.json)"));
 
   if (!QFileInfo::exists(fileName))
     return;

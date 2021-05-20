@@ -65,52 +65,60 @@ struct EnumParameter : public SchemaParameter
 
 ///////for concrete nodes///////////////////
 
-struct ParameterValue
+struct NodeParameter : public QObject
 {
-    QString value;
-    const QString& name;
-    ParameterValue(const QString& aName)
-        : name(aName) {}
-    virtual void addToJsonObject(QJsonObject& obj) const {
-        obj[name] = value;
+    Q_OBJECT
+public:
+    const QString& getValue() const {
+        return (!value.isEmpty() ? value : schema.defaultValue);
     }
-    virtual ~ParameterValue() = default;
+    void setValue(const QString& str) {
+        value = str;
+    }
+    const SchemaParameter& schema;
+    NodeParameter(const SchemaParameter& aSchema)
+        : schema(aSchema) {}
+    NodeParameter(const SchemaParameter& aSchema, const QString& str)
+        : schema(aSchema), value(str) {}
+    virtual void addToJsonObject(QJsonObject& obj) const;
+    virtual void restore(const QJsonObject &p);
+    virtual ~NodeParameter() = default;
+
+Q_SIGNALS:
+    void valueLoaded(const QString& newValue);
+
+private:
+    QString value;
+
 };
 
-struct ArrayParameterValue : public ParameterValue
+struct NodeArrayParameter : public NodeParameter
 {
     struct Item {
-        std::vector<ParameterValue> paramValues;
-        void addToJsonArray(QJsonArray& arr) const {
-            QJsonObject obj;
-            for (auto& param : paramValues) {
-                obj[param.name] = param.value;
-            }
-            arr.push_back(obj);
-        };
+        std::vector<std::unique_ptr<NodeParameter>> paramValues;
+
+        void addToJsonArray(QJsonArray& arr) const;
+
+        Item(const QJsonObject &p, const ArrayParameter& schema);
     };
-    void addToJsonObject(QJsonObject& obj) const override {
-        QJsonArray jsonArray;
-        for (auto& item : arr) {
-            item.addToJsonArray(jsonArray);
-        }
-        obj[name] = jsonArray;
-    }
+
+    const ArrayParameter& schema;
+
+    NodeArrayParameter(const ArrayParameter& aSchema)
+        : NodeParameter(aSchema), schema(aSchema) {}
+
+    void addToJsonObject(QJsonObject& obj) const override;
+    void restore(const QJsonObject &p) override;
+
     std::vector<Item> arr;
 };
 
 struct NodeData
 {
-    NodeData(Schema::Ptr aSchema)
-        : schema(aSchema) {
-        parameterValues.reserve(aSchema->parameters.size());
-        for (size_t i = 0; i < schema->parameters.size(); i++) {
-            parameterValues.emplace_back(schema->parameters[i]->name);
-        }
-    }
+    NodeData(Schema::Ptr aSchema);
     QJsonObject toJsonObject() const;
     Schema::Ptr schema;
-    std::vector<ParameterValue> parameterValues;
+    std::vector<std::unique_ptr<NodeParameter>> parameterValues;
 };
 
 

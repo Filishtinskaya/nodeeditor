@@ -55,7 +55,6 @@ ModelFromSchema::ModelFromSchema(Schema::Ptr aSchema)
 }
 
 ModelFromSchema::~ModelFromSchema() {
-    delete widget;
 }
 
 QWidget *ModelFromSchema::embeddedWidget() { return widget; }

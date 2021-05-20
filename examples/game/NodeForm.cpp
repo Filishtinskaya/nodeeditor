@@ -21,15 +21,18 @@ namespace {
     }
 }
 
-QWidget* NodeForm::makeEditingWidget(const SchemaParameter& param, ParameterValue* val)
+QWidget* NodeForm::makeEditingWidget(NodeParameter* val)
 {
-    switch (param.type) {
+    switch (val->schema.type) {
 
     case ParameterType::String: {
         auto lineEd = new QLineEdit(this);
-        lineEd->setText(param.defaultValue);
+        lineEd->setText(val->getValue());
         connect(lineEd, &QLineEdit::textEdited, [val](const QString &text){
-            val->value = text;
+            val->setValue(text);
+        });
+        connect(val, &NodeParameter::valueLoaded, [lineEd](const QString& value){
+            lineEd->setText(value);
         });
         return lineEd;
     }
@@ -42,17 +45,24 @@ QWidget* NodeForm::makeEditingWidget(const SchemaParameter& param, ParameterValu
         layout->addWidget(rdTrue);
         layout->addWidget(rdFalse);
 
-        if (param.defaultValue == "True")
+        if (val->getValue() == "True")
             rdTrue->setChecked(true);
         else
-            rdFalse->setChecked(false);
+            rdFalse->setChecked(true);
         groupBox->setLayout(layout);
 
         connect(rdTrue, &QRadioButton::clicked, [val]() {
-            val->value = "True";
+            val->setValue("True");
         });
         connect(rdFalse, &QRadioButton::clicked, [val]() {
-            val->value = "False";
+            val->setValue("False");
+        });
+
+        connect(val, &NodeParameter::valueLoaded, [rdTrue, rdFalse](const QString& value){
+            if (value == "True")
+                rdTrue->setChecked(true);
+            else
+                rdFalse->setChecked(true);
         });
 
         return groupBox;
@@ -60,43 +70,54 @@ QWidget* NodeForm::makeEditingWidget(const SchemaParameter& param, ParameterValu
 
     case ParameterType::Int: {
         auto spinBox = new QSpinBox(this);
-        spinBox->setValue(param.defaultValue.toInt());
+        spinBox->setValue(val->getValue().toInt());
         connect(spinBox, &QSpinBox::textChanged, [val](const QString &text) {
-            val->value = text;
+            val->setValue(text);
+        });
+        connect(val, &NodeParameter::valueLoaded, [spinBox](const QString& value){
+            spinBox->setValue(value.toInt());
         });
         return spinBox;
     }
     case ParameterType::Enum: {
         auto comboBox = new QComboBox(this);
-        auto enumParam = dynamic_cast<const EnumParameter*>(&param);
+        auto enumParam = dynamic_cast<const EnumParameter*>(&val->schema);
         for (auto& value : enumParam->values) {
             comboBox->addItem(value);
         }
-        comboBox->setCurrentText(enumParam->defaultValue);
+        comboBox->setCurrentText(val->getValue());
         connect(comboBox, &QComboBox::currentTextChanged, [val](const QString &text) {
-            val->value = text;
+            val->setValue(text);
+        });
+        connect(val, &NodeParameter::valueLoaded, [comboBox](const QString& value){
+            comboBox->setCurrentText(value);
         });
         return comboBox;
     }
 
     case ParameterType::Image: {
         auto label = new ClickableLabel(this);
-        fitPixmapInLabel(param.defaultValue, *label);
+        fitPixmapInLabel(val->getValue(), *label);
 
-        QObject::connect(label, &ClickableLabel::clicked, [label, val](){
+        connect(label, &ClickableLabel::clicked, [label, val](){
             QString fileName = QFileDialog::getOpenFileName(nullptr, "Choose image",
-                val->value, "Image Files (*.png *.jpg *.bmp)");
+                val->getValue(), "Image Files (*.png *.jpg *.bmp)");
             if (!fileName.isEmpty()) {
                 fitPixmapInLabel(fileName, *label);
-                val->value = fileName;
+                val->setValue(fileName);
             }
         });
+
+        connect(val, &NodeParameter::valueLoaded, [label](const QString& value){
+            fitPixmapInLabel(value, *label);
+        });
+
         return label;
     }
 
     case ParameterType::Array: {
         auto lineEd = new QLineEdit(this);
-        lineEd->setText(param.defaultValue);
+        lineEd->setText(val->schema.defaultValue);
         return lineEd;
     }
 
@@ -111,10 +132,9 @@ NodeForm::NodeForm(NodeData& aData) :
     ui->setupUi(this);
 
     ui->boxNodeArray->setTitle(aData.schema->nodeArrayName);
-    for (size_t i = 0; i < aData.schema->parameters.size(); i++) {
-        auto& param = aData.schema->parameters[i];
-        ui->formLayout->addRow(param->name,
-                                 makeEditingWidget(*param, &aData.parameterValues[i]));
+    for (auto& param : data.parameterValues) {
+        ui->formLayout->addRow(param->schema.name,
+                                 makeEditingWidget(param.get()));
     }
 }
 

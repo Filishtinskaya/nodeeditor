@@ -44,8 +44,13 @@ public:
 
      QJsonObject save() const override
       {
-        return data.toJsonObject();
+         return data.toJsonObject();
       }
+     void restore(QJsonObject const &p) override {
+        for (auto& param : data.parameterValues) {
+            param->restore(p);
+        }
+     }
      unsigned int nPorts(PortType) const override
       {
         return 3;
