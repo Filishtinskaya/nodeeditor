@@ -6,7 +6,7 @@
 
 #include <nodes/NodeDataModel>
 #include "nodes/DataModelRegistry"
-#include "Schema.hpp"
+#include "NodeInstance.hpp"
 
 using QtNodes::PortType;
 using QtNodes::PortIndex;
@@ -21,11 +21,10 @@ class JsonSchemaParser
 {
 public:
     JsonSchemaParser(DataModelRegistry& aReg);
-    void fetchModels();
 private:
     void registerModelFromSchema(Schema::Ptr aSchema);
     DataModelRegistry& dmRegistry;
-    Schema::Ptr rootSchema;
+    GeneralInfo info;
 };
 
 class ModelFromSchema : public NodeDataModel

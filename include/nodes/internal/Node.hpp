@@ -35,6 +35,7 @@ public:
 
   /// NodeDataModel should be an rvalue and is moved into the Node
   Node(std::unique_ptr<NodeDataModel> && dataModel);
+  Node(std::unique_ptr<NodeDataModel> && dataModel, const QJsonObject& json);
 
   virtual
   ~Node();

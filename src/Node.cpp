@@ -41,6 +41,12 @@ Node(std::unique_ptr<NodeDataModel> && dataModel)
           this, &Node::onNodeSizeUpdated );
 }
 
+Node::Node(std::unique_ptr<QtNodes::NodeDataModel> &&dataModel, const QJsonObject &json)
+    : Node(std::move(dataModel))
+{
+    restore(json);
+}
+
 
 Node::
 ~Node() = default;

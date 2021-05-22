@@ -3,11 +3,12 @@
 
 #include <QLineEdit>
 #include <QLabel>
-#include <QGroupBox>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QPushButton>
+#include <QToolBar>
 
 #include "ClickableLabel.hpp"
 
@@ -30,9 +31,6 @@ QWidget* NodeForm::makeEditingWidget(NodeParameter* val)
         lineEd->setText(val->getValue());
         connect(lineEd, &QLineEdit::textEdited, [val](const QString &text){
             val->setValue(text);
-        });
-        connect(val, &NodeParameter::valueLoaded, [lineEd](const QString& value){
-            lineEd->setText(value);
         });
         return lineEd;
     }
@@ -58,13 +56,6 @@ QWidget* NodeForm::makeEditingWidget(NodeParameter* val)
             val->setValue("False");
         });
 
-        connect(val, &NodeParameter::valueLoaded, [rdTrue, rdFalse](const QString& value){
-            if (value == "True")
-                rdTrue->setChecked(true);
-            else
-                rdFalse->setChecked(true);
-        });
-
         return groupBox;
     }
 
@@ -73,9 +64,6 @@ QWidget* NodeForm::makeEditingWidget(NodeParameter* val)
         spinBox->setValue(val->getValue().toInt());
         connect(spinBox, &QSpinBox::textChanged, [val](const QString &text) {
             val->setValue(text);
-        });
-        connect(val, &NodeParameter::valueLoaded, [spinBox](const QString& value){
-            spinBox->setValue(value.toInt());
         });
         return spinBox;
     }
@@ -88,9 +76,6 @@ QWidget* NodeForm::makeEditingWidget(NodeParameter* val)
         comboBox->setCurrentText(val->getValue());
         connect(comboBox, &QComboBox::currentTextChanged, [val](const QString &text) {
             val->setValue(text);
-        });
-        connect(val, &NodeParameter::valueLoaded, [comboBox](const QString& value){
-            comboBox->setCurrentText(value);
         });
         return comboBox;
     }
@@ -108,20 +93,33 @@ QWidget* NodeForm::makeEditingWidget(NodeParameter* val)
             }
         });
 
-        connect(val, &NodeParameter::valueLoaded, [label](const QString& value){
-            fitPixmapInLabel(value, *label);
-        });
-
         return label;
     }
 
-    case ParameterType::Array: {
+    /*case ParameterType::Array: {
         auto lineEd = new QLineEdit(this);
         lineEd->setText(val->schema.defaultValue);
         return lineEd;
-    }
+    }*/
 
     }
+}
+
+QGroupBox* NodeForm::addPlaceForActOption(ActOption &actOption)
+{
+    auto box = new QGroupBox(this);
+    auto layout = new QFormLayout(box);
+    box->setLayout(layout);
+    for (auto& param : actOption.parameterValues) {
+        layout->addRow(param->schema.name, makeEditingWidget(param.get()));
+    }
+    return box;
+}
+
+void NodeForm::newActOption()
+{
+    auto option = data.actOptions.emplace_back(data.schema->actOptionsSchema);
+    ui->formLayout_2->addWidget(addPlaceForActOption(option));
 }
 
 NodeForm::NodeForm(NodeData& aData) :
@@ -131,10 +129,24 @@ NodeForm::NodeForm(NodeData& aData) :
 {
     ui->setupUi(this);
 
-    ui->boxNodeArray->setTitle(aData.schema->nodeArrayName);
     for (auto& param : data.parameterValues) {
         ui->formLayout->addRow(param->schema.name,
                                  makeEditingWidget(param.get()));
+    }
+\
+    auto toolBar = new QToolBar();
+    ui->formLayout_2->addWidget(toolBar);
+    QAction* addActOption = toolBar->addAction("+");
+    QAction* removeActOption = toolBar->addAction("-");
+
+    connect(addActOption, &QAction::triggered, this, &NodeForm::newActOption);
+
+    connect(removeActOption, &QAction::triggered, [](){
+
+    });
+
+    for (auto& actOption : data.actOptions) {
+        ui->formLayout_2->addWidget(addPlaceForActOption(actOption));
     }
 }
 

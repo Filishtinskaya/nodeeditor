@@ -3,8 +3,9 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QGroupBox>
 
-#include "Schema.hpp"
+#include "NodeInstance.hpp"
 
 namespace Ui {
 class NodeForm;
@@ -20,6 +21,7 @@ public:
 
 private:
     QWidget* makeEditingWidget(NodeParameter* val);
+    QGroupBox* addPlaceForActOption(ActOption& actOption);
 
     QLineEdit* edName,
                edNodeArrayName;
@@ -29,6 +31,8 @@ private:
     NodeData& data;
 
 //    std::vector<QWidget*> paramsEdWidgets;
+private Q_SLOTS:
+    void newActOption();
 };
 
 #endif // NODEFORM_H

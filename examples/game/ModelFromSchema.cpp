@@ -24,14 +24,11 @@ QJsonObject fetchJson()
 
 
 JsonSchemaParser::JsonSchemaParser(DataModelRegistry& aReg)
-    : dmRegistry(aReg)
-{}
-
-void JsonSchemaParser::fetchModels()
+    : dmRegistry(aReg), info(fetchJson())
 {
-    rootSchema = std::make_shared<Schema>(fetchJson());
-
-    registerModelFromSchema(rootSchema);
+    for (auto& schema : info.nodeSchemes) {
+        registerModelFromSchema(schema);
+    }
 }
 
 void JsonSchemaParser::registerModelFromSchema(Schema::Ptr aSchema)
@@ -41,10 +38,6 @@ void JsonSchemaParser::registerModelFromSchema(Schema::Ptr aSchema)
     };
 
     dmRegistry.registerModel<ModelFromSchema>(creator);
-
-    for (auto& childSchema : aSchema->nodeArray) {
-        registerModelFromSchema(childSchema);
-    }
 }
 
 
