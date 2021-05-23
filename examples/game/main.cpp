@@ -23,6 +23,9 @@ int main(int argc, char *argv[])
     auto saveAction = menuBar->addAction("Save scene");
 //    auto saveJsonAction = menuBar->addAction("Save JSON");
     auto loadAction = menuBar->addAction("Load scene");
+    auto infoAction = menuBar->addAction("Show/hide general info");
+    infoAction->setCheckable(true);
+    infoAction->setChecked(true);
 
     QVBoxLayout *l = new QVBoxLayout(&mainWidget);
 
@@ -31,7 +34,8 @@ int main(int argc, char *argv[])
     JsonSchemaParser jsonParser(*registry);
 
     auto scene = new FlowScene(registry, &mainWidget);
-    l->addWidget(new FlowView(scene));
+    auto view = new FlowView(scene);
+    l->addWidget(view);
     l->setContentsMargins(0, 0, 0, 0);
     l->setSpacing(0);
 
@@ -41,9 +45,11 @@ int main(int argc, char *argv[])
     QObject::connect(loadAction, &QAction::triggered,
                      scene, &FlowScene::load);
 
-    InfoForm infoForm(jsonParser.info);
 
+    InfoForm infoForm(jsonParser.info);
     l->addWidget(&infoForm);
+    QObject::connect(infoAction, &QAction::toggled,
+                     &infoForm, &InfoForm::setVisible);
 
     mainWidget.setWindowTitle("Node editor");
     mainWidget.resize(800, 600);
