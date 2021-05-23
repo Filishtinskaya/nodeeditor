@@ -31,11 +31,14 @@ struct SchemaParameter
     const QString defaultValue; //std::variant???
 
     static ParameterType getType(const QJsonObject& obj);
-    SchemaParameter(const QJsonObject& obj);
 
     virtual ~SchemaParameter() = default;
 
     using Ptr = std::shared_ptr<SchemaParameter>;
+
+protected:
+    friend SchemaParameter::Ptr fromJsonValueRef<SchemaParameter::Ptr>(const QJsonValueRef ref);
+    SchemaParameter(const QJsonObject& obj); //fromJsonValueRef should be used to ensure polymorphism
 };
 
 struct ActOptionSchema {
@@ -59,8 +62,10 @@ struct Schema
 
 struct EnumParameter : public SchemaParameter
 {
-    EnumParameter(const QJsonObject& obj);
     std::vector<QString> values;
+private:
+    friend SchemaParameter::Ptr fromJsonValueRef<SchemaParameter::Ptr>(const QJsonValueRef ref);
+    EnumParameter(const QJsonObject& obj);
 };
 
 #endif // SCHEMA_H

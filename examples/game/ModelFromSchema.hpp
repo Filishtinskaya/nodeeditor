@@ -21,10 +21,10 @@ class JsonSchemaParser
 {
 public:
     JsonSchemaParser(DataModelRegistry& aReg);
+    GeneralInfo info;
 private:
     void registerModelFromSchema(Schema::Ptr aSchema);
     DataModelRegistry& dmRegistry;
-    GeneralInfo info;
 };
 
 class ModelFromSchema : public NodeDataModel

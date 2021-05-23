@@ -9,17 +9,16 @@ struct NodeParameter
 {
 public:
     const QString& getValue() const {
-        return (!value.isEmpty() ? value : schema.defaultValue);
+        return (!value.isEmpty() ? value : schema->defaultValue);
     }
     void setValue(const QString& str) {
         value = str;
     }
-    const SchemaParameter& schema;
-    NodeParameter(const SchemaParameter& aSchema)
+    using Ptr = std::shared_ptr<NodeParameter>;
+    SchemaParameter::Ptr schema;
+    NodeParameter(SchemaParameter::Ptr aSchema)
         : schema(aSchema) {}
-    NodeParameter(SchemaParameter&& aSchema)
-        : schema(std::move(aSchema)) {}
-    NodeParameter(const SchemaParameter& aSchema, const QString& str)
+    NodeParameter(SchemaParameter::Ptr aSchema, const QString& str)
         : schema(aSchema), value(str) {}
     virtual void addToJsonObject(QJsonObject& obj) const;
     virtual void restore(const QJsonObject &p);
@@ -32,7 +31,7 @@ private:
 
 struct ActOption {
     ActOption(const ActOptionSchema& schema);
-    std::vector<std::shared_ptr<NodeParameter>> parameterValues;
+    std::vector<NodeParameter::Ptr> parameterValues;
 };
 
 struct NodeData
@@ -40,14 +39,14 @@ struct NodeData
     NodeData(Schema::Ptr aSchema);
     QJsonObject toJsonObject() const;
     Schema::Ptr schema;
-    std::vector<std::unique_ptr<NodeParameter>> parameterValues;
+    std::vector<NodeParameter::Ptr> parameterValues;
     std::vector<ActOption> actOptions;
 };
 
 struct GeneralInfo {
     GeneralInfo(const QJsonObject& json);
     const QString name, nodeArrayName;
-    std::vector<NodeParameter> parameters;
+    std::vector<NodeParameter::Ptr> parameters;
     std::vector<Schema::Ptr> nodeSchemes;
 };
 
@@ -80,7 +79,7 @@ void linkParametersToSchemas(SchemaPtr schema, InstancePtr instance) {
         /*if (param->type == ParameterType::Array) {
             parameterValues.push_back(std::make_unique<NodeArrayParameter>(dynamic_cast<ArrayParameter&>(*param)));
         } else*/
-            instance->parameterValues.push_back(std::make_unique<NodeParameter>(*param));
+            instance->parameterValues.emplace_back(std::make_shared<NodeParameter>(param));
 
     }
 }

@@ -50,11 +50,11 @@ NodeArrayParameter::Item::Item(const QJsonObject &p, const ArrayParameter& schem
 
 
 void NodeParameter::addToJsonObject(QJsonObject &obj) const {
-    obj[schema.name] = value;
+    obj[schema->name] = value;
 }
 
 void NodeParameter::restore(const QJsonObject &p) {
-    value = p[schema.name].toString();
+    value = p[schema->name].toString();
 }
 
 GeneralInfo::GeneralInfo(const QJsonObject &json)
@@ -72,7 +72,7 @@ ActOption::ActOption(const ActOptionSchema &schema)
 
 
 template<>
-NodeParameter fromJsonValueRef<NodeParameter>(const QJsonValueRef ref) {
-    auto obj = ref.toObject();
-    return NodeParameter(SchemaParameter(obj));
+NodeParameter::Ptr fromJsonValueRef<NodeParameter::Ptr>(const QJsonValueRef ref) {
+    auto schema = fromJsonValueRef<SchemaParameter::Ptr>(ref);
+    return std::make_shared<NodeParameter>(schema);
 }

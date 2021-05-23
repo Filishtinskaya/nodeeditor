@@ -5,26 +5,21 @@
 #include <QLineEdit>
 #include <QGroupBox>
 
-#include "NodeInstance.hpp"
+#include "ParametersWidget.h"
 
 namespace Ui {
 class NodeForm;
 }
 
-class NodeForm : public QWidget
+class NodeForm : public ParametersWidget
 {
-    Q_OBJECT
-
 public:
     explicit NodeForm(NodeData& aData);
-    ~NodeForm();
+    virtual ~NodeForm();
 
 private:
-    QWidget* makeEditingWidget(NodeParameter* val);
     QGroupBox* addPlaceForActOption(ActOption& actOption);
-
-    QLineEdit* edName,
-               edNodeArrayName;
+    using ParametersWidget::makeEditingWidget;
 
     Ui::NodeForm *ui;
 

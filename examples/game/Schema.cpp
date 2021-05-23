@@ -52,12 +52,17 @@ template<>
 SchemaParameter::Ptr fromJsonValueRef<SchemaParameter::Ptr>(const QJsonValueRef ref) {
     auto obj = ref.toObject();
     switch(SchemaParameter::getType(obj)) {
-    case ParameterType::Enum:
-        return std::make_shared<EnumParameter>(obj);
+    case ParameterType::Enum: {
+        auto param = new EnumParameter(obj);
+        return std::shared_ptr<EnumParameter>(param);
+    }
     /*case ParameterType::Array:
         return std::make_shared<ArrayParameter>(obj);*/
-    default:
-        return std::make_shared<SchemaParameter>(obj);
+    default: {
+        //new - because make_shared doesn't have access to private constructor
+       auto param = new SchemaParameter(obj);
+       return std::shared_ptr<SchemaParameter>(param);
+    }
     }
 }
 

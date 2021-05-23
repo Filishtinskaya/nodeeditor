@@ -7,18 +7,11 @@
 #include <QtWidgets/QMenuBar>
 
 #include "ModelFromSchema.hpp"
+#include "InfoForm.h"
 
 using QtNodes::DataModelRegistry;
 using QtNodes::FlowScene;
 using QtNodes::FlowView;
-
-static std::shared_ptr<DataModelRegistry> registerDataModels()
-{
-  auto ret = std::make_shared<DataModelRegistry>();
-  JsonSchemaParser jsonParser(*ret);
-  return ret;
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +27,10 @@ int main(int argc, char *argv[])
     QVBoxLayout *l = new QVBoxLayout(&mainWidget);
 
     l->addWidget(menuBar);
-    auto scene = new FlowScene(registerDataModels(), &mainWidget);
+    auto registry = std::make_shared<DataModelRegistry>();
+    JsonSchemaParser jsonParser(*registry);
+
+    auto scene = new FlowScene(registry, &mainWidget);
     l->addWidget(new FlowView(scene));
     l->setContentsMargins(0, 0, 0, 0);
     l->setSpacing(0);
@@ -44,6 +40,10 @@ int main(int argc, char *argv[])
 
     QObject::connect(loadAction, &QAction::triggered,
                      scene, &FlowScene::load);
+
+    InfoForm infoForm(jsonParser.info);
+
+    l->addWidget(&infoForm);
 
     mainWidget.setWindowTitle("Node editor");
     mainWidget.resize(800, 600);
